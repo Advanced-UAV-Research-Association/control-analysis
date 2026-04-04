@@ -1,3 +1,7 @@
+# packages for build tools
+ipykernel
+jupytext
+
 # basic packages
 scipy
 numpy
