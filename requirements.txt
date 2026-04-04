@@ -1,0 +1,10 @@
+# basic packages
+scipy
+numpy
+pandas
+matplotlib
+
+# control stuff
+slycot
+control
+
