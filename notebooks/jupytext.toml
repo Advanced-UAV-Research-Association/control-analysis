@@ -1,0 +1,2 @@
+# Pair all notebooks to .py files automatically
+formats = "ipynb,py:percent"
