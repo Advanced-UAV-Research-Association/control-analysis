@@ -1,34 +1,24 @@
 {
-  "name": "Python Dev",
-  "image": "mcr.microsoft.com/devcontainers/python:3.12",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"name": "Python 3",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/python:1-3.12",
 
-  "features": {
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.12",
-      "toolsToInstall": "black,ruff,mypy,pytest,ipython"
-    },
-    "ghcr.io/devcontainers/features/git:1": {}
-  },
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
 
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-python.python",
-        "ms-toolsai.jupyter"
-      ],
-      "settings": {
-        "python.defaultInterpreterPath": "/usr/local/python/current/bin/python",
-        "editor.formatOnSave": true,
-        "[python]": {
-          "editor.defaultFormatter": "ms-python.black-formatter"
-        },
-        "python.testing.pytestEnabled": true
-      }
-    }
-  },
+	// Configure tool-specific properties.
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			"settings": {},
+			"extensions": []
+		}
+	},
+	
 
-  "postCreateCommand": "pip install -r requirements.txt",
-  "remoteUser": "vscode"
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "pip3 install -r requirements.txt"
 }
+
+
 
