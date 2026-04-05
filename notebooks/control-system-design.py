@@ -20,6 +20,7 @@
 # %load_ext autoreload
 # %autoreload 2
 
+import os
 import sys
 from pathlib import Path
 
@@ -27,3 +28,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path.cwd().parent))
 
 import extract_coefficients
+
+# %%
+# define paths
+Mass_Analysis_File = os.path.abspath("../data/flying_wing_better1_MassProps.txt")
+Stab_Analysis_File = os.path.abspath("../data/flying_wing_better1.stab")
+
+# %%
+# test getting inertial tensor
+inertia_tensor, components = extract_coefficients.extract_inertia_tensor(Mass_Analysis_File)
+print(inertia_tensor)
