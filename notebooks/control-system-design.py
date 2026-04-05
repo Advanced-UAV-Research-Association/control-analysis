@@ -38,3 +38,21 @@ Stab_Analysis_File = os.path.abspath("../data/flying_wing_better1.stab")
 # test getting inertial tensor
 inertia_tensor, components = extract_coefficients.extract_inertia_tensor(Mass_Analysis_File)
 print(inertia_tensor)
+
+# %%
+# test getting stability coefficents
+stability, controls, extras = extract_coefficients.extract_stab_coeff(Stab_Analysis_File)
+
+print("Stability derivatives:")
+for k, v in stability.items():
+    print(f"{k:12s} = {v: .6f}")
+
+print("\nControl derivatives:")
+for surface, vals in controls.items():
+    print(surface)
+    for k, v in vals.items():
+        print(f"  {k:10s} = {v: .6f}")
+
+print("\nExtras:")
+for k, v in extras.items():
+    print(f"{k:16s} = {v}")	
