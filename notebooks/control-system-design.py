@@ -29,6 +29,9 @@ sys.path.insert(0, str(Path.cwd().parent))
 
 import extract_coefficients
 
+# %% [markdown]
+# ### Define paths and output coefficents
+
 # %%
 # define paths
 Mass_Analysis_File = os.path.abspath("../data/flying_wing_better1_MassProps.txt")
