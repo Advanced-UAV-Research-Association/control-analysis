@@ -74,14 +74,11 @@ plt.grid(True)
 plt.show()
 
 # %%
-# Calculate and plot control input over time
-u = -K @ response.states  # control input u = -Kx
-u = u.flatten()  # flatten to 1D array
+# Check closed-loop stability
+poles = ct.poles(sys_cl)
+print("All poles stable:", all(p.real < 0 for p in poles))
 
-plt.figure()
-plt.plot(response.time, u)
-plt.xlabel("Time (s)")
-plt.ylabel("Control Input u")
-plt.title("LQR Control Input Over Time")
-plt.grid(True)
-plt.show()
+# Reconstruct control effort over time
+t_out, y_out, x_out = ct.initial_response(sys_cl, t, x0, return_x=True)
+u_out = -(K @ x_out)   # control effort at each timestep
+plt.plot(t_out, u_out.T); plt.title("Control Effort u(t)")
