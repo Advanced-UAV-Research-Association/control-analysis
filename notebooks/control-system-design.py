@@ -223,16 +223,43 @@ else:
 # Simulate the open loop response of each system with initial state perturbations
 
 # %%
+################################################################################
+# Simulation Constants 
+################################################################################
 # Define initial states for each system
-# Pitch system: small perturbation in angle of attack
-x0_pitch = np.array([0.1, 0.0, 0.1])  # [alpha, q, theta]
+# pitch axis initial conditions (in degrees)
+alpha_init_deg = 5.0  # angle of attack
+q_init_deg = 0.0  # pitch rate
+theta_init_deg = 5.0  # pitch angle
 
-# Roll system: small perturbation in roll rate
-x0_roll = np.array([0.1, 0.0])  # [p, phi]
+# roll axis initial conditions (in degrees)
+p_init_deg = 5.0  # roll rate
+phi_init_deg = 0.0  # roll angle
 
 # Simulation time
-T = 5  # seconds
+T = 3  # seconds
+
+################################################################################
+# Caclulations
+################################################################################
+
+# define simulation timescale
 t = np.linspace(0, T, 1000)
+
+# Convert degrees to radians
+alpha_init = np.deg2rad(alpha_init_deg)
+q_init = np.deg2rad(q_init_deg)
+theta_init = np.deg2rad(theta_init_deg)
+
+p_init = np.deg2rad(p_init_deg)
+phi_init = np.deg2rad(phi_init_deg)
+
+# Pitch system: small perturbation in angle of attack
+x0_pitch = np.array([alpha_init, q_init, theta_init])  # [alpha, q, theta]
+
+# Roll system: small perturbation in roll rate
+x0_roll = np.array([p_init, phi_init])  # [p, phi]
+
 
 # Simulate open loop response
 response_pitch = ct.initial_response(sys_pitch, t, X0=x0_pitch)
@@ -244,10 +271,12 @@ response_roll = ct.initial_response(sys_roll, t, X0=x0_roll)
 # %%
 fig, axes = plt.subplots(3, 1, figsize=(10, 8))
 
-states_pitch = ['Angle of Attack (rad)', 'Pitch Rate (rad/s)', 'Pitch Angle (rad)']
+states_pitch = ['Angle of Attack (deg)', 'Pitch Rate (deg/s)', 'Pitch Angle (deg)']
 
 for i, (ax, state) in enumerate(zip(axes, states_pitch)):
-    ax.plot(response_pitch.time, response_pitch.y[i], 'b-', linewidth=2)
+    # Convert radians to degrees for display
+    y_deg = np.rad2deg(response_pitch.y[i])
+    ax.plot(response_pitch.time, y_deg, 'cornflowerblue', linewidth=2)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(state)
     ax.grid(True, alpha=0.3)
@@ -262,10 +291,12 @@ plt.show()
 # %%
 fig, axes = plt.subplots(2, 1, figsize=(10, 6))
 
-states_roll = ['Roll Rate (rad/s)', 'Roll Angle (rad)']
+states_roll = ['Roll Rate (deg/s)', 'Roll Angle (deg)']
 
 for i, (ax, state) in enumerate(zip(axes, states_roll)):
-    ax.plot(response_roll.time, response_roll.y[i], 'r-', linewidth=2)
+    # Convert radians to degrees for display
+    y_deg = np.rad2deg(response_roll.y[i])
+    ax.plot(response_roll.time, y_deg, 'coral', linewidth=2)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(state)
     ax.grid(True, alpha=0.3)
@@ -273,5 +304,3 @@ for i, (ax, state) in enumerate(zip(axes, states_roll)):
 
 plt.tight_layout()
 plt.show()
-
-# %%
