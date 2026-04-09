@@ -5,6 +5,7 @@ RUN rm -f /etc/apt/sources.list.d/yarn.list \
 # update repos
  && apt update \
 # install dependencies for python control
+# also install npx for mcp for coding agents
  && apt install -y \
     build-essential \
     gfortran \
@@ -12,5 +13,7 @@ RUN rm -f /etc/apt/sources.list.d/yarn.list \
     ninja-build \
     libopenblas-dev \
     pkg-config \
+    nodejs \
+    npm \
  && rm -rf /var/lib/apt/lists/*
 
