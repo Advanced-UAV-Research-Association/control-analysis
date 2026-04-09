@@ -190,3 +190,11 @@ C_roll= np.eye(2)
 # D vectors, both zero
 D_pitch = np.zeros((3, 1))
 D_roll= np.zeros((2, 1))
+
+# %% [markdown]
+# ## Construct system and perform analysis
+
+# %%
+sys_pitch = ct.ss(A_pitch, B_pitch, C_pitch, D_pitch)
+sys_roll = ct.ss(A_roll, B_roll, C_roll, D_roll)
+
