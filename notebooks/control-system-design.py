@@ -234,7 +234,7 @@ theta_init_deg = 5.0  # pitch angle
 
 # roll axis initial conditions (in degrees)
 p_init_deg = 5.0  # roll rate
-phi_init_deg = 0.0  # roll angle
+phi_init_deg = 5.0  # roll angle
 
 # Simulation time
 T = 3  # seconds
