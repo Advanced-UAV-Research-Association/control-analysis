@@ -154,5 +154,36 @@ L_delta_a = q_inf * S_ref * b_ref / Ixx * controls['aileron']['Cl_delta']
 # We know D is 0
 
 # %%
-D_pitch = np.zeros((3, 1))
-D_roll= np.zeros((2, 1))
+# Construct A matrices
+A_pitch = np.array([
+    [Z_alpha, 1, 0],
+    [M_alpha, M_q, 0],
+    [0, 1, 0]
+])
+
+A_roll = np.array([
+    [L_p, 0],
+    [1, 0]
+])
+
+# Construct B matrices
+B_pitch = np.array([
+    [Z_delta_e],
+    [M_delta_e],
+    [0]
+])
+
+B_roll = np.array([
+    [L_delta_a],
+    [0]
+])
+
+print("Pitch State Matrix A:")
+print(A_pitch)
+print("\nPitch Input Matrix B:")
+print(B_pitch)
+
+print("\nRoll State Matrix A:")
+print(A_roll)
+print("\nRoll Input Matrix B:")
+print(B_roll)
