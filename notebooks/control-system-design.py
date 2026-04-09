@@ -84,6 +84,9 @@ rho = 1.225
 # ## calculate coefficients for the state space system
 # ### Pitch Axis
 #
+# State vector:
+# $$\mathbf{x}_{lon} = \begin{bmatrix} \alpha \\ q \\ \theta \end{bmatrix}$$
+#
 # $$A_{lon} = \begin{bmatrix} Z_\alpha & 1 & 0 \\ M_\alpha & M_q & 0 \\ 0 & 1 & 0 \end{bmatrix}, \quad
 # B_{lon} = \begin{bmatrix} Z_{\delta_e} \\ M_{\delta_e} \\ 0 \end{bmatrix}$$
 #
@@ -109,6 +112,9 @@ rho = 1.225
 # ---
 #
 # ### Roll Axis
+#
+# State vector:
+# $$\mathbf{x}_{roll} = \begin{bmatrix} p \\ \phi \end{bmatrix}$$
 #
 # $$A_{roll} = \begin{bmatrix} L_p & 0 \\ 1 & 0 \end{bmatrix}, \quad
 # B_{roll} = \begin{bmatrix} L_{\delta_a} \\ 0 \end{bmatrix}$$
@@ -151,7 +157,6 @@ L_delta_a = q_inf * S_ref * b_ref / Ixx * controls['aileron']['Cl_delta']
 
 # %% [markdown]
 # ## Construct State Matrices
-# We know D is 0
 
 # %%
 # Construct A matrices
@@ -178,12 +183,10 @@ B_roll = np.array([
     [0]
 ])
 
-print("Pitch State Matrix A:")
-print(A_pitch)
-print("\nPitch Input Matrix B:")
-print(B_pitch)
+# define the C matrices for the control library
+C_pitch = np.eye(3)
+C_roll= np.eye(2)
 
-print("\nRoll State Matrix A:")
-print(A_roll)
-print("\nRoll Input Matrix B:")
-print(B_roll)
+# D vectors, both zero
+D_pitch = np.zeros((3, 1))
+D_roll= np.zeros((2, 1))
