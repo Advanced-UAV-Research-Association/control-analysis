@@ -33,6 +33,13 @@ sys.path.insert(0, str(Path.cwd().parent))
 
 import extract_coefficients
 
+# install custom matplot theme if available
+try:
+    from crt_scope import crt_scope
+    crt_scope.install()
+except ImportError:
+    pass
+
 # %% [markdown]
 # ### Define paths and output coefficents
 
@@ -276,7 +283,8 @@ states_pitch = ['Angle of Attack (deg)', 'Pitch Rate (deg/s)', 'Pitch Angle (deg
 for i, (ax, state) in enumerate(zip(axes, states_pitch)):
     # Convert radians to degrees for display
     y_deg = np.rad2deg(response_pitch.y[i])
-    ax.plot(response_pitch.time, y_deg, 'cornflowerblue', linewidth=2)
+    # ax.plot(response_pitch.time, y_deg, 'cornflowerblue', linewidth=2)
+    ax.plot(response_pitch.time, y_deg, color='ch1', linewidth=2)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(state)
     ax.grid(True, alpha=0.3)
@@ -296,7 +304,8 @@ states_roll = ['Roll Rate (deg/s)', 'Roll Angle (deg)']
 for i, (ax, state) in enumerate(zip(axes, states_roll)):
     # Convert radians to degrees for display
     y_deg = np.rad2deg(response_roll.y[i])
-    ax.plot(response_roll.time, y_deg, 'coral', linewidth=2)
+    # ax.plot(response_roll.time, y_deg, 'coral', linewidth=2)
+    ax.plot(response_roll.time, y_deg, color='ch2', linewidth=2)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(state)
     ax.grid(True, alpha=0.3)
@@ -304,3 +313,6 @@ for i, (ax, state) in enumerate(zip(axes, states_roll)):
 
 plt.tight_layout()
 plt.show()
+
+# %% [markdown]
+# ## Closed Loop System Design
