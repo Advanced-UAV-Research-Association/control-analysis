@@ -198,3 +198,80 @@ D_roll= np.zeros((2, 1))
 sys_pitch = ct.ss(A_pitch, B_pitch, C_pitch, D_pitch)
 sys_roll = ct.ss(A_roll, B_roll, C_roll, D_roll)
 
+# Check controllability
+controllability_pitch = ct.ctrb(sys_pitch.A, sys_pitch.B)
+controllability_roll = ct.ctrb(sys_roll.A, sys_roll.B)
+
+rank_pitch = np.linalg.matrix_rank(controllability_pitch)
+rank_roll = np.linalg.matrix_rank(controllability_roll)
+
+print(f"Pitch system controllability matrix rank: {rank_pitch} (expected {sys_pitch.A.shape[0]})")
+print(f"Roll system controllability matrix rank: {rank_roll} (expected {sys_roll.A.shape[0]})")
+
+if rank_pitch == sys_pitch.A.shape[0]:
+    print("Pitch system is CONTROLLABLE")
+else:
+    print("Pitch system is NOT controllable")
+
+if rank_roll == sys_roll.A.shape[0]:
+    print("Roll system is CONTROLLABLE")
+else:
+    print("Roll system is NOT controllable")
+
+# %% [markdown]
+# ## Open Loop Response Simulation
+# Simulate the open loop response of each system with initial state perturbations
+
+# %%
+# Define initial states for each system
+# Pitch system: small perturbation in angle of attack
+x0_pitch = np.array([0.1, 0.0, 0.1])  # [alpha, q, theta]
+
+# Roll system: small perturbation in roll rate
+x0_roll = np.array([0.1, 0.0])  # [p, phi]
+
+# Simulation time
+T = 5  # seconds
+t = np.linspace(0, T, 1000)
+
+# Simulate open loop response
+response_pitch = ct.initial_response(sys_pitch, t, X0=x0_pitch)
+response_roll = ct.initial_response(sys_roll, t, X0=x0_roll)
+
+# %% [markdown]
+# ### Pitch Axis Response
+
+# %%
+fig, axes = plt.subplots(3, 1, figsize=(10, 8))
+
+states_pitch = ['Angle of Attack (rad)', 'Pitch Rate (rad/s)', 'Pitch Angle (rad)']
+
+for i, (ax, state) in enumerate(zip(axes, states_pitch)):
+    ax.plot(response_pitch.time, response_pitch.y[i], 'b-', linewidth=2)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel(state)
+    ax.grid(True, alpha=0.3)
+    ax.set_title(f'Pitch Axis - {state}')
+
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+# ### Roll Axis Response
+
+# %%
+fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+
+states_roll = ['Roll Rate (rad/s)', 'Roll Angle (rad)']
+
+for i, (ax, state) in enumerate(zip(axes, states_roll)):
+    ax.plot(response_roll.time, response_roll.y[i], 'r-', linewidth=2)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel(state)
+    ax.grid(True, alpha=0.3)
+    ax.set_title(f'Roll Axis - {state}')
+
+plt.tight_layout()
+plt.show()
+
+# %%
