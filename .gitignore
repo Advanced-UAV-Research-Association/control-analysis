@@ -4,6 +4,7 @@
 # kilocode stuff
 .kilocode
 .kilocodeignore
+context/
 
 # ignore jupyter notebooks, we will only track the python linked files
 *.ipynb
