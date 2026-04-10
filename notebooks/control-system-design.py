@@ -333,19 +333,19 @@ plt.show()
 Q_pitch = np.diag([
     100,   # alpha (angle of attack) - high weight for tight control
     1,    # q (pitch rate) - moderate weight
-    100     # theta (pitch angle) - high weight for attitude control
+    2000     # theta (pitch angle) - high weight for attitude control
 ])
 
-R_pitch = np.array([[100]])  # elevator control effort
+R_pitch = np.array([[20000]])  # elevator control effort
 
 # Roll Axis - State: [p, phi]
 # Q_roll: weight each state, R_roll: weight aileron control effort
 Q_roll = np.diag([
     1,    # p (roll rate) - moderate weight
-    1    # phi (roll angle) - high weight for roll attitude control
+    100   # phi (roll angle) - high weight for roll attitude control
 ])
 
-R_roll = np.array([[1.0]])  # aileron control effort
+R_roll = np.array([[6000]])  # aileron control effort
 
 # %% [markdown]
 # ### Compute LQR Gain Matrices
