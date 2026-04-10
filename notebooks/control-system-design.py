@@ -366,7 +366,8 @@ print(f"Closed-loop poles (roll): {E_roll}")
 print(f"Stable (roll): {all(p.real < 0 for p in E_roll)}")
 
 # %% [markdown]
-# ### Create Closed-Loop Systems
+# ## Closed Loop Response Simulation
+# Simulate the closed loop response of each system using the same variables as open loop
 
 # %%
 # create closed loop systems
@@ -377,10 +378,6 @@ A_cl_roll = A_roll - B_roll @ K_roll
 # Create closed-loop systems with same state dimensions as open-loop
 sys_cl_pitch = ct.ss(A_cl_pitch, B_pitch, C_pitch, D_pitch)
 sys_cl_roll = ct.ss(A_cl_roll, B_roll, C_roll, D_roll)
-
-# %% [markdown]
-# ## Closed Loop Response Simulation
-# Simulate the closed loop response of each system using the same variables as open loop
 
 # %%
 # Simulate closed loop response using same variables as open loop simulation
@@ -427,4 +424,37 @@ for i, (ax, state) in enumerate(zip(axes, states_roll)):
 plt.tight_layout()
 plt.show()
 
+# %% [markdown]
+# ## Control Input vs Time
+# Plot the control effort (elevator for pitch, aileron for roll) over time
+
 # %%
+# Calculate control effort for pitch axis
+# u = -K * x, where x is the state vector
+t_out_pitch, y_out_pitch, x_out_pitch = ct.initial_response(sys_cl_pitch, t, x0_pitch, return_x=True)
+u_out_pitch = -(K_pitch @ x_out_pitch)  # control effort (elevator deflection)
+
+t_out_roll, y_out_roll, x_out_roll = ct.initial_response(sys_cl_roll, t, x0_roll, return_x=True)
+u_out_roll = -(K_roll @ x_out_roll)  # control effort (aileron deflection)
+
+# %%
+# Plot control input vs time for pitch axis (elevator)
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(t_out_pitch, np.rad2deg(u_out_pitch[0]), color='ch1', linewidth=2)
+ax.set_xlabel('Time (s)')
+ax.set_ylabel('Elevator Deflection (deg)')
+ax.set_title('Closed Loop Control Input - Pitch Axis')
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# %%
+# Plot control input vs time for roll axis (aileron)
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(t_out_roll, np.rad2deg(u_out_roll[0]), color='ch2', linewidth=2)
+ax.set_xlabel('Time (s)')
+ax.set_ylabel('Aileron Deflection (deg)')
+ax.set_title('Closed Loop Control Input - Roll Axis')
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
