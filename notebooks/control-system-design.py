@@ -384,18 +384,31 @@ sys_cl_roll = ct.ss(A_cl_roll, B_roll, C_roll, D_roll)
 response_cl_pitch = ct.initial_response(sys_cl_pitch, t, X0=x0_pitch)
 response_cl_roll = ct.initial_response(sys_cl_roll, t, X0=x0_roll)
 
+# %%
+# Calculate control effort for both axes
+# u = -K * x, where x is the state vector
+t_out_pitch, y_out_pitch, x_out_pitch = ct.initial_response(sys_cl_pitch, t, x0_pitch, return_x=True)
+u_out_pitch = -(K_pitch @ x_out_pitch)  # control effort (elevator deflection)
+
+t_out_roll, y_out_roll, x_out_roll = ct.initial_response(sys_cl_roll, t, x0_roll, return_x=True)
+u_out_roll = -(K_roll @ x_out_roll)  # control effort (aileron deflection)
+
 # %% [markdown]
 # ### Closed Loop Pitch Axis Response
 
 # %%
-fig, axes = plt.subplots(3, 1, figsize=(10, 8))
+fig, axes = plt.subplots(4, 1, figsize=(10, 10))
 
-states_pitch = ['Angle of Attack (deg)', 'Pitch Rate (deg/s)', 'Pitch Angle (deg)']
+states_pitch = ['Angle of Attack (deg)', 'Pitch Rate (deg/s)', 'Pitch Angle (deg)', 'Elevator Deflection (deg)']
 
 for i, (ax, state) in enumerate(zip(axes, states_pitch)):
-    # Convert radians to degrees for display
-    y_deg = np.rad2deg(response_cl_pitch.y[i])
-    ax.plot(response_cl_pitch.time, y_deg, color='ch1', linewidth=2)
+    if i < 3:
+        # State variables
+        y_deg = np.rad2deg(response_cl_pitch.y[i])
+        ax.plot(response_cl_pitch.time, y_deg, color='ch1', linewidth=2)
+    else:
+        # Control effort
+        ax.plot(t_out_pitch, np.rad2deg(u_out_pitch[0]), color='ch2', linewidth=2)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(state)
     ax.grid(True, alpha=0.3)
@@ -408,53 +421,22 @@ plt.show()
 # ### Closed Loop Roll Axis Response
 
 # %%
-fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+fig, axes = plt.subplots(3, 1, figsize=(10, 8))
 
-states_roll = ['Roll Rate (deg/s)', 'Roll Angle (deg)']
+states_roll = ['Roll Rate (deg/s)', 'Roll Angle (deg)', 'Aileron Deflection (deg)']
 
 for i, (ax, state) in enumerate(zip(axes, states_roll)):
-    # Convert radians to degrees for display
-    y_deg = np.rad2deg(response_cl_roll.y[i])
-    ax.plot(response_cl_roll.time, y_deg, color='ch2', linewidth=2)
+    if i < 2:
+        # State variables
+        y_deg = np.rad2deg(response_cl_roll.y[i])
+        ax.plot(response_cl_roll.time, y_deg, color='ch1', linewidth=2)
+    else:
+        # Control effort
+        ax.plot(t_out_roll, np.rad2deg(u_out_roll[0]), color='ch2', linewidth=2)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(state)
     ax.grid(True, alpha=0.3)
     ax.set_title(f'Closed Loop Roll Axis - {state}')
 
-plt.tight_layout()
-plt.show()
-
-# %% [markdown]
-# ## Control Input vs Time
-# Plot the control effort (elevator for pitch, aileron for roll) over time
-
-# %%
-# Calculate control effort for pitch axis
-# u = -K * x, where x is the state vector
-t_out_pitch, y_out_pitch, x_out_pitch = ct.initial_response(sys_cl_pitch, t, x0_pitch, return_x=True)
-u_out_pitch = -(K_pitch @ x_out_pitch)  # control effort (elevator deflection)
-
-t_out_roll, y_out_roll, x_out_roll = ct.initial_response(sys_cl_roll, t, x0_roll, return_x=True)
-u_out_roll = -(K_roll @ x_out_roll)  # control effort (aileron deflection)
-
-# %%
-# Plot control input vs time for pitch axis (elevator)
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.plot(t_out_pitch, np.rad2deg(u_out_pitch[0]), color='ch1', linewidth=2)
-ax.set_xlabel('Time (s)')
-ax.set_ylabel('Elevator Deflection (deg)')
-ax.set_title('Closed Loop Control Input - Pitch Axis')
-ax.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-
-# %%
-# Plot control input vs time for roll axis (aileron)
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.plot(t_out_roll, np.rad2deg(u_out_roll[0]), color='ch2', linewidth=2)
-ax.set_xlabel('Time (s)')
-ax.set_ylabel('Aileron Deflection (deg)')
-ax.set_title('Closed Loop Control Input - Roll Axis')
-ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
