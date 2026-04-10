@@ -316,3 +316,115 @@ plt.show()
 
 # %% [markdown]
 # ## Closed Loop System Design
+# ### Define Q and R matrices for LQR
+#
+# Q matrix: State weighting matrix (penalizes state deviations)
+# R matrix: Control effort weighting matrix (penalizes control input)
+#
+# For LQR, we find K such that u = -Kx minimizes the cost:
+# J = ∫(x^T Q x + u^T R u) dt
+
+# %%
+# ============================================================================
+# Q and R Matrices for LQR
+# ============================================================================
+# Pitch Axis (Longitudinal) - State: [alpha, q, theta]
+# Q_pitch: weight each state, R_pitch: weight elevator control effort
+Q_pitch = np.diag([
+    100,   # alpha (angle of attack) - high weight for tight control
+    10,    # q (pitch rate) - moderate weight
+    50     # theta (pitch angle) - high weight for attitude control
+])
+
+R_pitch = np.array([[1.0]])  # elevator control effort
+
+# Roll Axis - State: [p, phi]
+# Q_roll: weight each state, R_roll: weight aileron control effort
+Q_roll = np.diag([
+    10,    # p (roll rate) - moderate weight
+    100    # phi (roll angle) - high weight for roll attitude control
+])
+
+R_roll = np.array([[1.0]])  # aileron control effort
+
+# %% [markdown]
+# ### Compute LQR Gain Matrices
+
+# %%
+# Compute LQR gains for pitch axis
+K_pitch, S_pitch, E_pitch = ct.lqr(sys_pitch, Q_pitch, R_pitch)
+print("Pitch LQR Gains:")
+print(f"K_pitch = {K_pitch}")
+print(f"Closed-loop poles (pitch): {E_pitch}")
+print(f"Stable (pitch): {all(p.real < 0 for p in E_pitch)}")
+
+# Compute LQR gains for roll axis
+K_roll, S_roll, E_roll = ct.lqr(sys_roll, Q_roll, R_roll)
+print("\nRoll LQR Gains:")
+print(f"K_roll = {K_roll}")
+print(f"Closed-loop poles (roll): {E_roll}")
+print(f"Stable (roll): {all(p.real < 0 for p in E_roll)}")
+
+# %% [markdown]
+# ### Create Closed-Loop Systems
+
+# %%
+# create closed loop systems
+# Compute closed-loop A matrices: A_cl = A - B*K
+A_cl_pitch = A_pitch - B_pitch @ K_pitch
+A_cl_roll = A_roll - B_roll @ K_roll
+
+# Create closed-loop systems with same state dimensions as open-loop
+sys_cl_pitch = ct.ss(A_cl_pitch, B_pitch, C_pitch, D_pitch)
+sys_cl_roll = ct.ss(A_cl_roll, B_roll, C_roll, D_roll)
+
+# %% [markdown]
+# ## Closed Loop Response Simulation
+# Simulate the closed loop response of each system using the same variables as open loop
+
+# %%
+# Simulate closed loop response using same variables as open loop simulation
+response_cl_pitch = ct.initial_response(sys_cl_pitch, t, X0=x0_pitch)
+response_cl_roll = ct.initial_response(sys_cl_roll, t, X0=x0_roll)
+
+# %% [markdown]
+# ### Closed Loop Pitch Axis Response
+
+# %%
+fig, axes = plt.subplots(3, 1, figsize=(10, 8))
+
+states_pitch = ['Angle of Attack (deg)', 'Pitch Rate (deg/s)', 'Pitch Angle (deg)']
+
+for i, (ax, state) in enumerate(zip(axes, states_pitch)):
+    # Convert radians to degrees for display
+    y_deg = np.rad2deg(response_cl_pitch.y[i])
+    ax.plot(response_cl_pitch.time, y_deg, color='ch1', linewidth=2)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel(state)
+    ax.grid(True, alpha=0.3)
+    ax.set_title(f'Closed Loop Pitch Axis - {state}')
+
+plt.tight_layout()
+plt.show()
+
+# %% [markdown]
+# ### Closed Loop Roll Axis Response
+
+# %%
+fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+
+states_roll = ['Roll Rate (deg/s)', 'Roll Angle (deg)']
+
+for i, (ax, state) in enumerate(zip(axes, states_roll)):
+    # Convert radians to degrees for display
+    y_deg = np.rad2deg(response_cl_roll.y[i])
+    ax.plot(response_cl_roll.time, y_deg, color='ch2', linewidth=2)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel(state)
+    ax.grid(True, alpha=0.3)
+    ax.set_title(f'Closed Loop Roll Axis - {state}')
+
+plt.tight_layout()
+plt.show()
+
+# %%
