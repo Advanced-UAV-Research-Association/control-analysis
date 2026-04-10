@@ -236,7 +236,7 @@ else:
 # Define initial states for each system
 # pitch axis initial conditions (in degrees)
 alpha_init_deg = 5.0  # angle of attack
-q_init_deg = 0.0  # pitch rate
+q_init_deg = 5.0  # pitch rate
 theta_init_deg = 5.0  # pitch angle
 
 # roll axis initial conditions (in degrees)
@@ -332,17 +332,17 @@ plt.show()
 # Q_pitch: weight each state, R_pitch: weight elevator control effort
 Q_pitch = np.diag([
     100,   # alpha (angle of attack) - high weight for tight control
-    10,    # q (pitch rate) - moderate weight
-    50     # theta (pitch angle) - high weight for attitude control
+    1,    # q (pitch rate) - moderate weight
+    100     # theta (pitch angle) - high weight for attitude control
 ])
 
-R_pitch = np.array([[1.0]])  # elevator control effort
+R_pitch = np.array([[100]])  # elevator control effort
 
 # Roll Axis - State: [p, phi]
 # Q_roll: weight each state, R_roll: weight aileron control effort
 Q_roll = np.diag([
-    10,    # p (roll rate) - moderate weight
-    100    # phi (roll angle) - high weight for roll attitude control
+    1,    # p (roll rate) - moderate weight
+    1    # phi (roll angle) - high weight for roll attitude control
 ])
 
 R_roll = np.array([[1.0]])  # aileron control effort
