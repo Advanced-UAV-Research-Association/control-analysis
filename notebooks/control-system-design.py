@@ -45,8 +45,8 @@ except ImportError:
 
 # %%
 # define paths
-Mass_Analysis_File = os.path.abspath("../data/flying_wing_better1_MassProps.txt")
-Stab_Analysis_File = os.path.abspath("../data/flying_wing_better1.stab")
+Mass_Analysis_File = os.path.abspath("../data/flying_wing_better2_MassProps.txt")
+Stab_Analysis_File = os.path.abspath("../data/flying_wing_better2.stab")
 
 # %%
 # test getting inertial tensor
