@@ -88,58 +88,6 @@ mass = 0.61373
 
 rho = 1.225
 
-# %% [markdown]
-# ## calculate coefficients for the state space system
-# ### Pitch Axis
-#
-# State vector:
-# $$\mathbf{x}_{lon} = \begin{bmatrix} \alpha \\ q \\ \theta \end{bmatrix}$$
-#
-# $$A_{lon} = \begin{bmatrix} Z_\alpha & 1 & 0 \\ M_\alpha & M_q & 0 \\ 0 & 1 & 0 \end{bmatrix}, \quad
-# B_{lon} = \begin{bmatrix} Z_{\delta_e} \\ M_{\delta_e} \\ 0 \end{bmatrix}$$
-#
-# <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-# <div>
-#
-# $$Z_\alpha = -\frac{q_\infty S}{m V_0} C_{L_\alpha}$$
-#
-# $$M_\alpha = \frac{q_\infty S \bar{c}}{I_{yy}} C_{m_\alpha}$$
-#
-# $$M_q = \frac{q_\infty S \bar{c}^2}{2 V_0 I_{yy}} C_{m_q}$$
-#
-# </div>
-# <div>
-#
-# $$Z_{\delta_e} = -\frac{q_\infty S}{m V_0} C_{L_{\delta_e}}$$
-#
-# $$M_{\delta_e} = \frac{q_\infty S \bar{c}}{I_{yy}} C_{m_{\delta_e}}$$
-#
-# </div>
-# </div>
-#
-# ---
-#
-# ### Roll Axis
-#
-# State vector:
-# $$\mathbf{x}_{roll} = \begin{bmatrix} p \\ \phi \end{bmatrix}$$
-#
-# $$A_{roll} = \begin{bmatrix} L_p & 0 \\ 1 & 0 \end{bmatrix}, \quad
-# B_{roll} = \begin{bmatrix} L_{\delta_a} \\ 0 \end{bmatrix}$$
-#
-# <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-# <div>
-#
-# $$L_p = \frac{q_\infty S b^2}{2 V_0 I_{xx}} C_{l_p}$$
-#
-# </div>
-# <div>
-#
-# $$L_{\delta_a} = \frac{q_\infty S b}{I_{xx}} C_{l_{\delta_a}}$$
-#
-# </div>
-# </div>
-
 # %%
 # get system coefficients
 
@@ -245,7 +193,7 @@ p_init_deg = 5.0  # roll rate
 phi_init_deg = 5.0  # roll angle
 
 # Simulation time
-T = 3  # seconds
+T = 2  # seconds
 
 ################################################################################
 # Caclulations
@@ -457,7 +405,7 @@ ax2.plot(response_cl_pitch.time, q_deg_cl, color='ch2', linewidth=2, label='Pitc
 ax.set_xlabel('Time (s)', fontsize=14)
 ax.set_ylabel('Angle (deg)', fontsize=14)
 ax2.set_ylabel('Pitch Rate (deg/s)', fontsize=14)
-ax.grid(True, alpha=0.3)
+ax2.grid(False)
 ax.set_title('Closed Loop Pitch Axis Response', fontsize=16, fontweight='bold')
 
 # Align zero points on both y-axes
@@ -481,16 +429,13 @@ plt.show()
 # %%
 fig, ax = plt.subplots(figsize=(12, 8))
 
-# Create secondary axis on the left for the rate variable (deg/s)
 ax2 = ax.twinx()
 
-# Angle variable on primary axis (right side) - phi (i=1)
 phi_deg_cl = np.rad2deg(response_cl_roll.y[1])
-ax.plot(response_cl_roll.time, phi_deg_cl, color='ch2', linewidth=2, label='Roll Angle (deg)')
+ax.plot(response_cl_roll.time, phi_deg_cl, color='ch1', linewidth=2, label='Roll Angle (deg)')
 
-# Rate variable on secondary axis (left side) - p (i=0)
 p_deg_cl = np.rad2deg(response_cl_roll.y[0])
-ax2.plot(response_cl_roll.time, p_deg_cl, color='ch1', linewidth=2, label='Roll Rate (deg/s)')
+ax2.plot(response_cl_roll.time, p_deg_cl, color='ch2', linewidth=2, label='Roll Rate (deg/s)')
 
 ax.set_xlabel('Time (s)', fontsize=14)
 ax.set_ylabel('Angle (deg)', fontsize=14)
@@ -498,14 +443,30 @@ ax2.set_ylabel('Roll Rate (deg/s)', fontsize=14)
 ax.grid(True, alpha=0.3)
 ax.set_title('Closed Loop Roll Axis Response', fontsize=16, fontweight='bold')
 
-# Align zero points on both y-axes
-y1_low, y1_high = ax.get_ylim()
-y2_low, y2_high = ax2.get_ylim()
-ratio = y1_high / abs(y1_low) if y1_low < 0 else 1
-neg_needed = max(abs(y2_low), y2_high / ratio)
-ax2.set_ylim(-neg_needed, neg_needed * ratio)
+# Axis limit configuration
+left_margin_bottom = 0       # extra padding at the bottom of left axis
+right_scaling_factor = 10    # multiplier to scale right axis limits
 
-# Combine legends from both axes
+# --- Left axis (roll angle) — auto-scaled with margin ---
+y1_low, y1_high = ax.get_ylim()
+y1_neg_limit = abs(y1_low) + left_margin_bottom
+
+# --- Right axis (roll rate) — scaled by right_scaling_factor ---
+y2_low, y2_high = ax2.get_ylim()
+y2_pos_limit  = y2_high * right_scaling_factor
+y2_neg_raw    = abs(y2_low) * right_scaling_factor
+
+# Compute negative-to-positive ratio for each axis
+ratio_left  = y1_neg_limit / y1_high
+ratio_right = abs(y2_low) / y2_high  # scaling cancels, same shape
+
+# Use the larger ratio so neither axis clips its data
+final_ratio = max(ratio_left, ratio_right)
+
+# Apply the shared zero point (same top/bottom ratio on both axes)
+ax.set_ylim(-final_ratio * y1_high, y1_high)
+ax2.set_ylim(-final_ratio * y2_pos_limit, y2_pos_limit)
+
 lines1, labels1 = ax.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
 ax.legend(lines1 + lines2, labels1 + labels2, fontsize=12, loc='best')
